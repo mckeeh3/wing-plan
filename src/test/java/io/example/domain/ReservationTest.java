@@ -253,6 +253,54 @@ class ReservationTest {
     assertEquals(Reservation.ParticipantStatus.available, newState.aircraft().status());
   }
 
+  @Test
+  void shouldCancelReservation() {
+    // Given
+    var state = createPendingReservation();
+
+    {
+      var command = new Reservation.Command.StudentAvailable(state.reservationId());
+      var events = state.onCommand(command);
+      state = state.onEvent((Reservation.Event.StudentAvailable) events.get(0));
+      assertEquals(Reservation.ParticipantStatus.available, state.student().status());
+    }
+
+    {
+      var command = new Reservation.Command.InstructorAvailable(state.reservationId());
+      var events = state.onCommand(command);
+      state = state.onEvent((Reservation.Event.InstructorAvailable) events.get(0));
+      assertEquals(Reservation.ParticipantStatus.available, state.instructor().status());
+    }
+
+    {
+      var command = new Reservation.Command.AircraftAvailable(state.reservationId());
+      var events = state.onCommand(command);
+      assertEquals(2, events.size());
+      state = state
+          .onEvent((Reservation.Event.AircraftAvailable) events.get(0))
+          .onEvent((Reservation.Event.ReservationConfirmed) events.get(1));
+      assertEquals(Reservation.Status.confirmed, state.status());
+    }
+
+    {
+      var command = new Reservation.Command.CancelReservation(state.reservationId());
+      var events = state.onCommand(command);
+      assertEquals(4, events.size());
+      state = state
+          .onEvent((Reservation.Event.CancelledStudentReservation) events.get(0))
+          .onEvent((Reservation.Event.CancelledInstructorReservation) events.get(1))
+          .onEvent((Reservation.Event.CancelledAircraftReservation) events.get(2))
+          .onEvent((Reservation.Event.ReservationCancelled) events.get(3));
+      assertEquals(Reservation.Status.cancelled, state.status());
+    }
+
+    { // idempotence test, already cancelled should not change state or emit events
+      var command = new Reservation.Command.CancelReservation(state.reservationId());
+      var events = state.onCommand(command);
+      assertTrue(events.isEmpty());
+    }
+  }
+
   // Helper methods
   private Reservation.State createPendingReservation() {
     var command = new Reservation.Command.CreateReservation(

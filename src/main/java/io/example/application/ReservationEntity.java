@@ -81,6 +81,14 @@ public class ReservationEntity extends EventSourcedEntity<Reservation.State, Res
         .thenReply(newState -> done());
   }
 
+  public Effect<Done> cancelReservation(Reservation.Command.CancelReservation command) {
+    log.info("EntityId: {}\n_State: {}\n_Command: {}", entityId, currentState(), command);
+
+    return effects()
+        .persistAll(currentState().onCommand(command))
+        .thenReply(newState -> done());
+  }
+
   public ReadOnlyEffect<Reservation.State> get() {
     if (currentState().isEmpty()) {
       return effects().error("Reservation not found");
@@ -103,6 +111,9 @@ public class ReservationEntity extends EventSourcedEntity<Reservation.State, Res
       case Reservation.Event.AircraftUnavailable e -> currentState().onEvent(e);
       case Reservation.Event.ReservationConfirmed e -> currentState().onEvent(e);
       case Reservation.Event.ReservationCancelled e -> currentState().onEvent(e);
+      case Reservation.Event.CancelledStudentReservation e -> currentState().onEvent(e);
+      case Reservation.Event.CancelledInstructorReservation e -> currentState().onEvent(e);
+      case Reservation.Event.CancelledAircraftReservation e -> currentState().onEvent(e);
     };
   }
 }

@@ -150,6 +150,18 @@ public interface Reservation {
           new Event.ReservationCancelled(command.reservationId()));
     }
 
+    public List<Event> onCommand(Command.CancelReservation command) {
+      if (isEmpty() || status() != Status.confirmed) {
+        return List.of();
+      }
+
+      return List.of(
+          new Event.CancelledStudentReservation(student.timeSlotId(), command.reservationId()),
+          new Event.CancelledInstructorReservation(instructor.timeSlotId(), command.reservationId()),
+          new Event.CancelledAircraftReservation(aircraft.timeSlotId(), command.reservationId()),
+          new Event.ReservationCancelled(command.reservationId()));
+    }
+
     public State onEvent(Event.ReservationCreated event) {
       return new State(
           event.reservationId(),
@@ -251,6 +263,18 @@ public interface Reservation {
           reservationTime,
           Status.cancelled);
     }
+
+    public State onEvent(Event.CancelledStudentReservation event) {
+      return this;
+    }
+
+    public State onEvent(Event.CancelledInstructorReservation event) {
+      return this;
+    }
+
+    public State onEvent(Event.CancelledAircraftReservation event) {
+      return this;
+    }
   }
 
   public sealed interface Command {
@@ -280,6 +304,9 @@ public interface Reservation {
         String reservationId) implements Command {}
 
     public record AircraftUnavailable(
+        String reservationId) implements Command {}
+
+    public record CancelReservation(
         String reservationId) implements Command {}
   }
 
@@ -335,6 +362,18 @@ public interface Reservation {
         String reservationId) implements Event {}
 
     public record ReservationCancelled(
+        String reservationId) implements Event {}
+
+    public record CancelledStudentReservation(
+        String studentTimeSlotId,
+        String reservationId) implements Event {}
+
+    public record CancelledInstructorReservation(
+        String instructorTimeSlotId,
+        String reservationId) implements Event {}
+
+    public record CancelledAircraftReservation(
+        String aircraftTimeSlotId,
         String reservationId) implements Event {}
   }
 

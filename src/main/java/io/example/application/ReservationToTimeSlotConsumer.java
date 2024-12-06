@@ -22,11 +22,14 @@ public class ReservationToTimeSlotConsumer extends Consumer {
 
   public Effect onEvent(Reservation.Event event) {
     return switch (event) {
-    case Reservation.Event.StudentWantsTimeSlot e -> onEvent(e);
-    case Reservation.Event.InstructorWantsTimeSlot e -> onEvent(e);
-    case Reservation.Event.AircraftWantsTimeSlot e -> onEvent(e);
-    // Ignore other events
-    default -> effects().ignore();
+      case Reservation.Event.StudentWantsTimeSlot e -> onEvent(e);
+      case Reservation.Event.InstructorWantsTimeSlot e -> onEvent(e);
+      case Reservation.Event.AircraftWantsTimeSlot e -> onEvent(e);
+      case Reservation.Event.CancelledStudentReservation e -> onEvent(e);
+      case Reservation.Event.CancelledInstructorReservation e -> onEvent(e);
+      case Reservation.Event.CancelledAircraftReservation e -> onEvent(e);
+      // Ignore other events
+      default -> effects().ignore();
     };
   }
 
@@ -59,6 +62,39 @@ public class ReservationToTimeSlotConsumer extends Consumer {
         event.reservationId());
     var timeSlot = componentClient.forEventSourcedEntity(event.timeSlotId())
         .method(TimeSlotEntity::aircraftRequestsTimeSlot)
+        .invokeAsync(command);
+    return effects().asyncDone(timeSlot);
+  }
+
+  private Effect onEvent(Reservation.Event.CancelledStudentReservation event) {
+    log.info("Event: {}", event);
+    var command = new TimeSlot.Command.CancelTimeSlot(
+        event.studentTimeSlotId(),
+        event.reservationId());
+    var timeSlot = componentClient.forEventSourcedEntity(event.studentTimeSlotId())
+        .method(TimeSlotEntity::cancelTimeSlot)
+        .invokeAsync(command);
+    return effects().asyncDone(timeSlot);
+  }
+
+  private Effect onEvent(Reservation.Event.CancelledInstructorReservation event) {
+    log.info("Event: {}", event);
+    var command = new TimeSlot.Command.CancelTimeSlot(
+        event.instructorTimeSlotId(),
+        event.reservationId());
+    var timeSlot = componentClient.forEventSourcedEntity(event.instructorTimeSlotId())
+        .method(TimeSlotEntity::cancelTimeSlot)
+        .invokeAsync(command);
+    return effects().asyncDone(timeSlot);
+  }
+
+  private Effect onEvent(Reservation.Event.CancelledAircraftReservation event) {
+    log.info("Event: {}", event);
+    var command = new TimeSlot.Command.CancelTimeSlot(
+        event.aircraftTimeSlotId(),
+        event.reservationId());
+    var timeSlot = componentClient.forEventSourcedEntity(event.aircraftTimeSlotId())
+        .method(TimeSlotEntity::cancelTimeSlot)
         .invokeAsync(command);
     return effects().asyncDone(timeSlot);
   }

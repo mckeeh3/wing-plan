@@ -46,9 +46,16 @@ public class ReservationEndpoint {
         .invokeAsync(command);
   }
 
+  @Put("/reservation-cancel")
+  public CompletionStage<Done> cancel(Reservation.Command.CancelReservation command) {
+    log.info("{}", command);
+    return componentClient.forEventSourcedEntity(command.reservationId())
+        .method(ReservationEntity::cancelReservation)
+        .invokeAsync(command);
+  }
+
   @Get("/reservation/{entityId}")
   public CompletionStage<Reservation.State> get(String entityId) {
-    log.info("{}", entityId);
     return componentClient.forEventSourcedEntity(entityId)
         .method(ReservationEntity::get)
         .invokeAsync();
@@ -72,7 +79,6 @@ public class ReservationEndpoint {
 
   @Get("/time-slot/{entityId}")
   public CompletionStage<TimeSlot.State> getTimeSlot(String entityId) {
-    log.info("{}", entityId);
     return componentClient.forEventSourcedEntity(entityId)
         .method(TimeSlotEntity::get)
         .invokeAsync();

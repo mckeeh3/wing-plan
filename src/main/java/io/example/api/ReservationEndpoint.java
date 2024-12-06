@@ -32,7 +32,7 @@ public class ReservationEndpoint {
 
   @Post("/booking")
   public CompletionStage<Done> startBooking(BookingWorkflow.BookingRequest request) {
-    log.info("Starting booking for reservationId {}, student {} at {}", request.reservationId(), request.studentId(), request.reservationTime());
+    log.info("{}", request);
     return componentClient.forWorkflow(request.reservationId())
         .method(BookingWorkflow::startBooking)
         .invokeAsync(request);
@@ -40,7 +40,7 @@ public class ReservationEndpoint {
 
   @Post("/reservation")
   public CompletionStage<Done> create(Reservation.Command.CreateReservation command) {
-    log.info("Creating reservation {}", command);
+    log.info("{}", command);
     return componentClient.forEventSourcedEntity(command.reservationId())
         .method(ReservationEntity::createReservation)
         .invokeAsync(command);
@@ -48,7 +48,7 @@ public class ReservationEndpoint {
 
   @Get("/reservation/{entityId}")
   public CompletionStage<Reservation.State> get(String entityId) {
-    log.info("Getting reservation {}", entityId);
+    log.info("{}", entityId);
     return componentClient.forEventSourcedEntity(entityId)
         .method(ReservationEntity::get)
         .invokeAsync();
@@ -56,7 +56,7 @@ public class ReservationEndpoint {
 
   @Post("/make-time-slot-available")
   public CompletionStage<Done> createTimeSlot(TimeSlot.Command.MakeTimeSlotAvailable command) {
-    log.info("Creating time slot {}", command);
+    log.info("{}", command);
     return componentClient.forEventSourcedEntity(command.timeSlotId())
         .method(TimeSlotEntity::createTimeSlot)
         .invokeAsync(command);
@@ -64,7 +64,7 @@ public class ReservationEndpoint {
 
   @Put("/make-time-slot-unavailable")
   public CompletionStage<Done> makeTimeSlotUnavailable(TimeSlot.Command.MakeTimeSlotUnavailable command) {
-    log.info("Making time slot unavailable {}", command);
+    log.info("{}", command);
     return componentClient.forEventSourcedEntity(command.timeSlotId())
         .method(TimeSlotEntity::makeTimeSlotUnavailable)
         .invokeAsync(command);
@@ -72,7 +72,7 @@ public class ReservationEndpoint {
 
   @Get("/time-slot/{entityId}")
   public CompletionStage<TimeSlot.State> getTimeSlot(String entityId) {
-    log.info("Getting time slot {}", entityId);
+    log.info("{}", entityId);
     return componentClient.forEventSourcedEntity(entityId)
         .method(TimeSlotEntity::get)
         .invokeAsync();
@@ -80,7 +80,6 @@ public class ReservationEndpoint {
 
   @Get("/time-slot-view-all")
   public CompletionStage<TimeSlotView.TimeSlots> getAllTimeSlots() {
-    log.info("Getting all time slots");
     return componentClient.forView()
         .method(TimeSlotView::getAllTimeSlots)
         .invokeAsync();
@@ -88,7 +87,6 @@ public class ReservationEndpoint {
 
   @Post("/time-slot-view-by-type-and-time-range")
   public CompletionStage<TimeSlotView.TimeSlots> getTimeSlotByTypeAndTimeRange(TimeSlotView.ByTypeAndTimeRange command) {
-    log.info("{}", command);
     return componentClient.forView()
         .method(TimeSlotView::getTimeSlotsByParticipantTypeAndTimeRange)
         .invokeAsync(command);
@@ -103,7 +101,6 @@ public class ReservationEndpoint {
 
   @Post("/time-slot-view-by-student-id-and-time-range")
   public CompletionStage<TimeSlotView.TimeSlots> getTimeSlotByStudentIdAndTimeRange(TimeSlotView.ByStudentIdAndTimeRange command) {
-    log.info("{}", command);
     return componentClient.forView()
         .method(TimeSlotView::getTimeSlotsByStudentIdAndTimeRange)
         .invokeAsync(command);

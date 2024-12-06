@@ -25,7 +25,7 @@ public class BookingWorkflow extends Workflow<Booking.State> {
   public record BookingRequest(String reservationId, String studentId, Instant reservationTime) {}
 
   public Effect<Done> startBooking(BookingRequest request) {
-    log.info("Starting booking for {}", request);
+    log.info("{}", request);
     var command = new TimeSlotView.ByStudentIdAndTimeRange(
         request.studentId(),
         request.reservationTime(),
@@ -69,12 +69,12 @@ public class BookingWorkflow extends Workflow<Booking.State> {
                 .updateState(currentState().withStatus(Booking.Status.cancelledStudentNotAvailable))
                 .end();
           }
-          var timeSlotId = queryResponse.timeSlots().get(0).timeSlotId();
+          var studentTimeSlotId = queryResponse.timeSlots().get(0).timeSlotId();
           var startTime = currentState().reservationTime();
           var endTime = startTime.plus(Duration.ofHours(1));
           var nextCommand = new TimeSlotView.ByTypeAndTimeRange(TimeSlot.ParticipantType.instructor.name(), startTime, endTime);
           return effects()
-              .updateState(currentState().withStudentTimeSlot(timeSlotId))
+              .updateState(currentState().withStudentTimeSlot(studentTimeSlotId))
               .transitionTo("find-available-instructor", nextCommand);
         });
 
@@ -88,13 +88,13 @@ public class BookingWorkflow extends Workflow<Booking.State> {
                 .updateState(currentState().withStatus(Booking.Status.cancelledInstructorNotAvailable))
                 .end();
           }
-          var timeSlotId = queryResponse.timeSlots().get(0).timeSlotId();
+          var instructorTimeSlotId = queryResponse.timeSlots().get(0).timeSlotId();
           var instructorId = queryResponse.timeSlots().get(0).participantId();
           var startTime = currentState().reservationTime();
           var endTime = startTime.plus(Duration.ofHours(1));
           var nextCommand = new TimeSlotView.ByTypeAndTimeRange(TimeSlot.ParticipantType.aircraft.name(), startTime, endTime);
           return effects()
-              .updateState(currentState().withInstructor(instructorId, timeSlotId))
+              .updateState(currentState().withInstructor(instructorId, instructorTimeSlotId))
               .transitionTo("find-available-aircraft", nextCommand);
         });
 
@@ -108,7 +108,7 @@ public class BookingWorkflow extends Workflow<Booking.State> {
                 .updateState(currentState().withStatus(Booking.Status.cancelledAircraftNotAvailable))
                 .end();
           }
-          var timeSlotId = queryResponse.timeSlots().get(0).timeSlotId();
+          var aircraftTimeSlotId = queryResponse.timeSlots().get(0).timeSlotId();
           var aircraftId = queryResponse.timeSlots().get(0).participantId();
           var nextCommand = new Reservation.Command.CreateReservation(
               Reservation.generateReservationId(),
@@ -116,11 +116,11 @@ public class BookingWorkflow extends Workflow<Booking.State> {
               currentState().studentTimeSlotId(),
               currentState().instructorId(),
               currentState().instructorTimeSlotId(),
-              currentState().aircraftId(),
-              currentState().aircraftTimeSlotId(),
+              aircraftId,
+              aircraftTimeSlotId,
               currentState().reservationTime());
           return effects()
-              .updateState(currentState().withAircraft(aircraftId, timeSlotId))
+              .updateState(currentState().withAircraft(aircraftId, aircraftTimeSlotId))
               .transitionTo("create-reservation", nextCommand);
         });
 

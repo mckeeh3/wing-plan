@@ -225,9 +225,9 @@ class ReservationTest {
     var state = createPendingReservation();
 
     // Make student and instructor available
-    var student = new Reservation.Participant(studentTimeSlotId, Reservation.ParticipantStatus.available);
+    var student = new Reservation.Participant(studentId, TimeSlot.ParticipantType.student.name(), studentTimeSlotId, Reservation.ParticipantStatus.available);
     var studentAvailable = new Reservation.Event.StudentAvailable(state.reservationId(), student);
-    var instructor = new Reservation.Participant(instructorTimeSlotId, Reservation.ParticipantStatus.available);
+    var instructor = new Reservation.Participant(instructorId, TimeSlot.ParticipantType.instructor.name(), instructorTimeSlotId, Reservation.ParticipantStatus.available);
     var instructorAvailable = new Reservation.Event.InstructorAvailable(state.reservationId(), instructor);
     state = state
         .onEvent(studentAvailable)

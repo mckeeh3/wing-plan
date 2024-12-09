@@ -1,49 +1,45 @@
 # wing-plan
 
+A reactive microservice built with Akka that manages flight school student lesson scheduling. This application demonstrates how to build scalable, resilient systems using the actor model pattern.
 
-To understand the Akka concepts that are the basis for this example, see [Development Process](https://doc.akka.io/concepts/development-process.html) in the documentation.
+## Overview
 
+This application is a flight school management system that handles the scheduling and coordination of flight lessons between students and instructors. It leverages Akka's actor system to manage concurrent operations and state in a distributed environment.
 
-This project contains the skeleton to create an Akka service. To understand more about these components, see [Developing services](https://doc.akka.io/java/index.html). Examples can be found [here](https://doc.akka.io/java/samples.html).
+### Key Features
 
+- **Flight Lesson Scheduling**: Manages the scheduling of flight lessons between students and instructors
+- **Reactive Architecture**: Built using Akka's actor model for responsive, resilient, and scalable operations
+- **RESTful API**: Provides HTTP endpoints for interacting with the scheduling system
+- **Event-Driven Design**: Uses event sourcing for maintaining system state and history
 
-Use Maven to build your project:
+### Technical Architecture
+
+The application is structured using Akka's best practices:
+- Actor-based domain model for managing flight school entities
+- HTTP interface using Akka HTTP
+- Event sourcing for maintaining scheduling state
+- Clustering support for scalability
+
+## Getting Started
+
+### Prerequisites
+- Java 11 or higher
+- Maven
+- Docker (for containerization)
+
+### Running Locally
+
+1. Build the project:
 
 ```shell
 mvn compile
 ```
 
-
-When running an Akka service locally.
-
-To start your service locally, run:
+2. Start the service:
 
 ```shell
 mvn compile exec:java
 ```
 
-This command will start your Akka service. With your Akka service running, the endpoint it's available at:
-
-```shell
-curl http://localhost:9000/hello
-```
-
-
-You can use the [Akka Console](https://console.akka.io) to create a project and see the status of your service.
-
-Build container image:
-
-```shell
-mvn clean install -DskipTests
-```
-
-Install the `akka` CLI as documented in [Install Akka CLI](https://doc.akka.io/reference/cli/index.html).
-
-Deploy the service using the image tag from above `mvn install`:
-
-```shell
-akka service deploy wing-plan wing-plan:tag-name --push
-```
-
-Refer to [Deploy and manage services](https://doc.akka.io/operations/services/deploy-service.html)
-for more information.
+3. Test

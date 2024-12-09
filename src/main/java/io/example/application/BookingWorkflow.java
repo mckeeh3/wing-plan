@@ -36,23 +36,6 @@ public class BookingWorkflow extends Workflow<Booking.State> {
         .thenReply(done());
   }
 
-  public Effect<Done> confirmOrCancelBooking(Reservation.Status status) {
-    if (currentState().status() == Booking.Status.pending) {
-      if (status == Reservation.Status.confirmed) {
-        return effects()
-            .updateState(currentState().withStatus(Booking.Status.confirmed))
-            .end()
-            .thenReply(done());
-      } else {
-        return effects()
-            .updateState(currentState().withStatus(Booking.Status.reservationUnavailable))
-            .end()
-            .thenReply(done());
-      }
-    }
-    return effects().error("Booking is not pending");
-  }
-
   public ReadOnlyEffect<Booking.State> get() {
     return effects().reply(currentState());
   }
@@ -60,9 +43,10 @@ public class BookingWorkflow extends Workflow<Booking.State> {
   @Override
   public WorkflowDef<Booking.State> definition() {
     var checkIfStudentIsAvailable = step("check-if-student-is-available")
-        .asyncCall(TimeSlotView.ByStudentIdAndTimeRange.class, command -> componentClient.forView()
-            .method(TimeSlotView::getTimeSlotsByStudentIdAndTimeRange)
-            .invokeAsync(command))
+        .asyncCall(TimeSlotView.ByStudentIdAndTimeRange.class,
+            command -> componentClient.forView()
+                .method(TimeSlotView::getTimeSlotsByStudentIdAndTimeRange)
+                .invokeAsync(command))
         .andThen(TimeSlotView.TimeSlots.class, queryResponse -> {
           if (queryResponse.timeSlots().isEmpty()) {
             return effects()
@@ -79,9 +63,10 @@ public class BookingWorkflow extends Workflow<Booking.State> {
         });
 
     var findAvailableInstructor = step("find-available-instructor")
-        .asyncCall(TimeSlotView.ByTypeAndTimeRange.class, command -> componentClient.forView()
-            .method(TimeSlotView::getTimeSlotsByParticipantTypeAndTimeRange)
-            .invokeAsync(command))
+        .asyncCall(TimeSlotView.ByTypeAndTimeRange.class,
+            command -> componentClient.forView()
+                .method(TimeSlotView::getTimeSlotsByParticipantTypeAndTimeRange)
+                .invokeAsync(command))
         .andThen(TimeSlotView.TimeSlots.class, queryResponse -> {
           if (queryResponse.timeSlots().isEmpty()) {
             return effects()
@@ -99,9 +84,10 @@ public class BookingWorkflow extends Workflow<Booking.State> {
         });
 
     var findAvailableAircraft = step("find-available-aircraft")
-        .asyncCall(TimeSlotView.ByTypeAndTimeRange.class, command -> componentClient.forView()
-            .method(TimeSlotView::getTimeSlotsByParticipantTypeAndTimeRange)
-            .invokeAsync(command))
+        .asyncCall(TimeSlotView.ByTypeAndTimeRange.class,
+            command -> componentClient.forView()
+                .method(TimeSlotView::getTimeSlotsByParticipantTypeAndTimeRange)
+                .invokeAsync(command))
         .andThen(TimeSlotView.TimeSlots.class, queryResponse -> {
           if (queryResponse.timeSlots().isEmpty()) {
             return effects()
@@ -110,8 +96,9 @@ public class BookingWorkflow extends Workflow<Booking.State> {
           }
           var aircraftTimeSlotId = queryResponse.timeSlots().get(0).timeSlotId();
           var aircraftId = queryResponse.timeSlots().get(0).participantId();
+          var reservationId = Reservation.generateReservationId();
           var nextCommand = new Reservation.Command.CreateReservation(
-              Reservation.generateReservationId(),
+              reservationId,
               currentState().studentId(),
               currentState().studentTimeSlotId(),
               currentState().instructorId(),
@@ -120,15 +107,19 @@ public class BookingWorkflow extends Workflow<Booking.State> {
               aircraftTimeSlotId,
               currentState().reservationTime());
           return effects()
-              .updateState(currentState().withAircraft(aircraftId, aircraftTimeSlotId))
+              .updateState(currentState().withAircraftAndReservationId(aircraftId, aircraftTimeSlotId, reservationId))
               .transitionTo("create-reservation", nextCommand);
         });
 
     var createReservation = step("create-reservation")
-        .asyncCall(Reservation.Command.CreateReservation.class, command -> componentClient.forEventSourcedEntity(command.reservationId())
-            .method(ReservationEntity::createReservation)
-            .invokeAsync(command))
-        .andThen(Done.class, __ -> effects().pause());
+        .asyncCall(Reservation.Command.CreateReservation.class,
+            command -> componentClient.forEventSourcedEntity(command.reservationId())
+                .method(ReservationEntity::createReservation)
+                .invokeAsync(command))
+        .andThen(Done.class, __ -> {
+          effects().updateState(currentState().withStatus(Booking.Status.reservationRequested));
+          return effects().end();
+        });
 
     return workflow()
         .addStep(checkIfStudentIsAvailable)

@@ -16,6 +16,7 @@ This application is a flight school management system that handles the schedulin
 ### Technical Architecture
 
 The application is structured using Akka's best practices:
+
 - Actor-based domain model for managing flight school entities
 - HTTP interface using Akka HTTP
 - Event sourcing for maintaining scheduling state
@@ -24,6 +25,7 @@ The application is structured using Akka's best practices:
 ## Getting Started
 
 ### Prerequisites
+
 - Java 11 or higher
 - Maven
 - Docker (for containerization)
@@ -32,14 +34,16 @@ The application is structured using Akka's best practices:
 
 1. Build the project:
 
-```shell
-mvn compile
-```
+  ```shell
+  mvn compile
+  ```
 
 2. Start the service:
 
-```shell
-mvn compile exec:java
-```
+  ```shell
+  mvn compile exec:java
+  ```
 
 3. Test
+
+4. The service will be available at `http://localhost:8080`

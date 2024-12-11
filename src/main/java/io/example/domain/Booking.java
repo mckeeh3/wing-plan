@@ -22,7 +22,16 @@ public interface Booking {
       String reservationId,
       Status status) {
     public static State initialState(String studentId, Instant reservationTime) {
-      return new State(studentId, null, null, null, null, null, reservationTime, null, Status.pending);
+      return new State(
+          studentId,
+          null,
+          null,
+          null,
+          null,
+          null,
+          reservationTime,
+          null,
+          Status.pending);
     }
 
     public boolean isEmpty() {

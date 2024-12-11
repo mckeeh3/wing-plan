@@ -29,14 +29,15 @@ fi
 # Create JSON body
 json_body=$(cat <<EOF
 {
-  "studentId": "$studentId",
+  "participantId": "$studentId",
+  "participantType": "student",
   "timeBegin": "$startTime",
   "timeEnd": "$endTime"
 }
 EOF
 )
 
-curl -X POST "${urlScheme}://${host}/flight/time-slot-view-by-student-id-and-time-range" \
+curl -X POST "${urlScheme}://${host}/flight/time-slot-view-by-participant-and-time-range" \
   -H "Content-Type: application/json" \
   -d "$json_body"
 

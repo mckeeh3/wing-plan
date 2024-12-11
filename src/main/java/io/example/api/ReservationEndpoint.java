@@ -92,7 +92,7 @@ public class ReservationEndpoint {
   }
 
   @Post("/time-slot-view-by-type-and-time-range")
-  public CompletionStage<TimeSlotView.TimeSlots> getTimeSlotByTypeAndTimeRange(TimeSlotView.ByTypeAndTimeRange command) {
+  public CompletionStage<TimeSlotView.TimeSlots> getTimeSlotByTypeAndTimeRange(TimeSlotView.ByParticipantTypeAndTimeRange command) {
     return componentClient.forView()
         .method(TimeSlotView::getTimeSlotsByParticipantTypeAndTimeRange)
         .invokeAsync(command);
@@ -102,13 +102,6 @@ public class ReservationEndpoint {
   public CompletionStage<TimeSlotView.TimeSlots> getTimeSlotByParticipantAndTimeRange(TimeSlotView.ByParticipantAndTimeRange command) {
     return componentClient.forView()
         .method(TimeSlotView::getTimeSlotsByParticipantAndTimeRange)
-        .invokeAsync(command);
-  }
-
-  @Post("/time-slot-view-by-student-id-and-time-range")
-  public CompletionStage<TimeSlotView.TimeSlots> getTimeSlotByStudentIdAndTimeRange(TimeSlotView.ByStudentIdAndTimeRange command) {
-    return componentClient.forView()
-        .method(TimeSlotView::getTimeSlotsByStudentIdAndTimeRange)
         .invokeAsync(command);
   }
 }

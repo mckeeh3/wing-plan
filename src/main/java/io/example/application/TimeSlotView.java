@@ -34,7 +34,7 @@ public class TimeSlotView extends View {
           AND startTime >= :timeBegin
           AND startTime < :timeEnd
           """)
-  public QueryEffect<TimeSlots> getTimeSlotsByParticipantTypeAndTimeRange(ByTypeAndTimeRange byTypeAndTimeRange) {
+  public QueryEffect<TimeSlots> getTimeSlotsByParticipantTypeAndTimeRange(ByParticipantTypeAndTimeRange byTypeAndTimeRange) {
     log.info("{}", byTypeAndTimeRange);
     return queryResult();
   }
@@ -48,19 +48,6 @@ public class TimeSlotView extends View {
           AND startTime < :timeEnd
           """)
   public QueryEffect<TimeSlots> getTimeSlotsByParticipantAndTimeRange(ByParticipantAndTimeRange byParticipantAndTimeRange) {
-    return queryResult();
-  }
-
-  @Query("""
-      SELECT * as timeSlots
-        FROM time_slot_view
-        WHERE participantId = :studentId
-          AND participantType = 'student'
-          AND startTime >= :timeBegin
-          AND startTime < :timeEnd
-          """)
-  public QueryEffect<TimeSlots> getTimeSlotsByStudentIdAndTimeRange(ByStudentIdAndTimeRange byIdAndTimeRange) {
-    log.info("{}", byIdAndTimeRange);
     return queryResult();
   }
 
@@ -165,13 +152,8 @@ public class TimeSlotView extends View {
       String participantType,
       String reservationId) {}
 
-  public record ByTypeAndTimeRange(
+  public record ByParticipantTypeAndTimeRange(
       String participantType,
-      Instant timeBegin,
-      Instant timeEnd) {}
-
-  public record ByStudentIdAndTimeRange(
-      String studentId,
       Instant timeBegin,
       Instant timeEnd) {}
 

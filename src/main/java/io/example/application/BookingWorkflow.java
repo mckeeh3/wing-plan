@@ -4,6 +4,7 @@ import static akka.Done.done;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 import akka.Done;
 import akka.javasdk.annotations.ComponentId;
@@ -26,10 +27,13 @@ public class BookingWorkflow extends Workflow<Booking.State> {
 
   public Effect<Done> startBooking(BookingRequest request) {
     log.info("{}", request);
-    var command = new TimeSlotView.ByStudentIdAndTimeRange(
+
+    var reservationTime = request.reservationTime().truncatedTo(ChronoUnit.HOURS);
+    var command = new TimeSlotView.ByParticipantAndTimeRange(
         request.studentId(),
-        request.reservationTime(),
-        request.reservationTime().plus(Duration.ofHours(1)));
+        "student",
+        reservationTime,
+        reservationTime.plus(Duration.ofHours(1)));
     return effects()
         .updateState(Booking.State.initialState(request.studentId(), request.reservationTime()))
         .transitionTo("check-if-student-is-available", command)
@@ -43,9 +47,9 @@ public class BookingWorkflow extends Workflow<Booking.State> {
   @Override
   public WorkflowDef<Booking.State> definition() {
     var checkIfStudentIsAvailable = step("check-if-student-is-available")
-        .asyncCall(TimeSlotView.ByStudentIdAndTimeRange.class,
+        .asyncCall(TimeSlotView.ByParticipantAndTimeRange.class,
             command -> componentClient.forView()
-                .method(TimeSlotView::getTimeSlotsByStudentIdAndTimeRange)
+                .method(TimeSlotView::getTimeSlotsByParticipantAndTimeRange)
                 .invokeAsync(command))
         .andThen(TimeSlotView.TimeSlots.class, queryResponse -> {
           if (queryResponse.timeSlots().isEmpty()) {
@@ -56,14 +60,14 @@ public class BookingWorkflow extends Workflow<Booking.State> {
           var studentTimeSlotId = queryResponse.timeSlots().get(0).timeSlotId();
           var startTime = currentState().reservationTime();
           var endTime = startTime.plus(Duration.ofHours(1));
-          var nextCommand = new TimeSlotView.ByTypeAndTimeRange(TimeSlot.ParticipantType.instructor.name(), startTime, endTime);
+          var nextCommand = new TimeSlotView.ByParticipantTypeAndTimeRange(TimeSlot.ParticipantType.instructor.name(), startTime, endTime);
           return effects()
               .updateState(currentState().withStudentTimeSlot(studentTimeSlotId))
               .transitionTo("find-available-instructor", nextCommand);
         });
 
     var findAvailableInstructor = step("find-available-instructor")
-        .asyncCall(TimeSlotView.ByTypeAndTimeRange.class,
+        .asyncCall(TimeSlotView.ByParticipantTypeAndTimeRange.class,
             command -> componentClient.forView()
                 .method(TimeSlotView::getTimeSlotsByParticipantTypeAndTimeRange)
                 .invokeAsync(command))
@@ -77,14 +81,14 @@ public class BookingWorkflow extends Workflow<Booking.State> {
           var instructorId = queryResponse.timeSlots().get(0).participantId();
           var startTime = currentState().reservationTime();
           var endTime = startTime.plus(Duration.ofHours(1));
-          var nextCommand = new TimeSlotView.ByTypeAndTimeRange(TimeSlot.ParticipantType.aircraft.name(), startTime, endTime);
+          var nextCommand = new TimeSlotView.ByParticipantTypeAndTimeRange(TimeSlot.ParticipantType.aircraft.name(), startTime, endTime);
           return effects()
               .updateState(currentState().withInstructor(instructorId, instructorTimeSlotId))
               .transitionTo("find-available-aircraft", nextCommand);
         });
 
     var findAvailableAircraft = step("find-available-aircraft")
-        .asyncCall(TimeSlotView.ByTypeAndTimeRange.class,
+        .asyncCall(TimeSlotView.ByParticipantTypeAndTimeRange.class,
             command -> componentClient.forView()
                 .method(TimeSlotView::getTimeSlotsByParticipantTypeAndTimeRange)
                 .invokeAsync(command))

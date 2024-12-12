@@ -129,7 +129,7 @@ class TimeSlotEntityTest {
 
     var state = testKit.getState();
     assertEquals(TimeSlot.Status.scheduled, state.status());
-    assertEquals(reservationId, state.scheduledToReservationId());
+    assertEquals(reservationId, state.reservationId());
   }
 
   @Test
@@ -171,7 +171,7 @@ class TimeSlotEntityTest {
 
     var state = testKit.getState();
     assertEquals(TimeSlot.Status.scheduled, state.status());
-    assertEquals(reservationId, state.scheduledToReservationId());
+    assertEquals(reservationId, state.reservationId());
   }
 
   @Test
@@ -213,7 +213,7 @@ class TimeSlotEntityTest {
 
     var state = testKit.getState();
     assertEquals(TimeSlot.Status.scheduled, state.status());
-    assertEquals(reservationId, state.scheduledToReservationId());
+    assertEquals(reservationId, state.reservationId());
   }
 
   @Test
@@ -260,7 +260,7 @@ class TimeSlotEntityTest {
 
     var state = testKit.getState();
     assertEquals(TimeSlot.Status.available, state.status());
-    assertNull(state.scheduledToReservationId());
+    assertNull(state.reservationId());
   }
 
   @Test

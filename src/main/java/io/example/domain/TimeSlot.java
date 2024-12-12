@@ -25,7 +25,7 @@ public interface TimeSlot {
       ParticipantType participantType, // Type of participant (student, instructor, aircraft)
       Instant startTime, // Start time of the time slot slot
       Status status, // Current status of this time slot
-      String scheduledToReservationId) {
+      String reservationId) {
 
     public static State empty() {
       return new State(null, null, null, Instant.EPOCH, Status.available, null);
@@ -57,7 +57,7 @@ public interface TimeSlot {
 
     public Optional<Event> onCommand(Command.CancelTimeSlot command) {
       if (!isEmpty() && status == Status.scheduled
-          && command.reservationId.equals(scheduledToReservationId)) {
+          && command.reservationId.equals(reservationId)) {
         return Optional.of(new Event.TimeSlotReservationCancelled(
             command.timeSlotId,
             command.reservationId));
@@ -70,7 +70,7 @@ public interface TimeSlot {
         return Optional.of(new Event.StudentRequestAccepted(
             command.timeSlotId,
             command.reservationId));
-      } else if (status == Status.scheduled && command.reservationId.equals(scheduledToReservationId)) {
+      } else if (status == Status.scheduled && command.reservationId.equals(reservationId)) {
         return Optional.empty(); // Idempotent case - already scheduled with same reservation
       }
       return Optional.of(new Event.StudentRequestRejected(
@@ -83,7 +83,7 @@ public interface TimeSlot {
         return Optional.of(new Event.InstructorRequestAccepted(
             command.timeSlotId,
             command.reservationId));
-      } else if (status == Status.scheduled && command.reservationId.equals(scheduledToReservationId)) {
+      } else if (status == Status.scheduled && command.reservationId.equals(reservationId)) {
         return Optional.empty(); // Idempotent case
       }
       return Optional.of(new Event.InstructorRequestRejected(
@@ -96,7 +96,7 @@ public interface TimeSlot {
         return Optional.of(new Event.AircraftRequestAccepted(
             command.timeSlotId,
             command.reservationId));
-      } else if (status == Status.scheduled && command.reservationId.equals(scheduledToReservationId)) {
+      } else if (status == Status.scheduled && command.reservationId.equals(reservationId)) {
         return Optional.empty(); // Idempotent case
       }
       return Optional.of(new Event.AircraftRequestRejected(

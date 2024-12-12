@@ -102,7 +102,7 @@ class TimeSlotTest {
 
     var newState = state.onEvent(accepted);
     assertThat(newState.status()).isEqualTo(TimeSlot.Status.scheduled);
-    assertThat(newState.scheduledToReservationId()).isEqualTo(command.reservationId());
+    assertThat(newState.reservationId()).isEqualTo(command.reservationId());
   }
 
   @Test
@@ -165,7 +165,7 @@ class TimeSlotTest {
 
     var newState = state.onEvent(accepted);
     assertThat(newState.status()).isEqualTo(TimeSlot.Status.scheduled);
-    assertThat(newState.scheduledToReservationId()).isEqualTo(command.reservationId());
+    assertThat(newState.reservationId()).isEqualTo(command.reservationId());
   }
 
   @Test
@@ -212,7 +212,7 @@ class TimeSlotTest {
 
     var newState = state.onEvent(accepted);
     assertThat(newState.status()).isEqualTo(TimeSlot.Status.scheduled);
-    assertThat(newState.scheduledToReservationId()).isEqualTo(command.reservationId());
+    assertThat(newState.reservationId()).isEqualTo(command.reservationId());
   }
 
   @Test
@@ -262,7 +262,7 @@ class TimeSlotTest {
 
     var newState = state.onEvent(cancelled);
     assertThat(newState.status()).isEqualTo(TimeSlot.Status.available);
-    assertThat(newState.scheduledToReservationId()).isNull();
+    assertThat(newState.reservationId()).isNull();
   }
 
   @Test
@@ -298,7 +298,7 @@ class TimeSlotTest {
 
     // then verify the time slot is still scheduled
     assertThat(state.status()).isEqualTo(TimeSlot.Status.scheduled);
-    assertThat(state.scheduledToReservationId()).isEqualTo("reservation-1");
+    assertThat(state.reservationId()).isEqualTo("reservation-1");
   }
 
   // Helper method

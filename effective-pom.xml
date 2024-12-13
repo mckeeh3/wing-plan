@@ -15,7 +15,7 @@
   <parent>
     <groupId>io.akka</groupId>
     <artifactId>akka-javasdk-parent</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.2</version>
   </parent>
   <groupId>io.example</groupId>
   <artifactId>wing-plan</artifactId>
@@ -43,15 +43,14 @@
     <url>https://github.com/akka/akka-sdk/akka-javasdk-parent/wing-plan</url>
   </scm>
   <properties>
-    <akka-javasdk.version>3.0.0</akka-javasdk.version>
+    <akka-javasdk.version>3.0.2</akka-javasdk.version>
     <build-helper-maven-plugin.version>3.2.0</build-helper-maven-plugin.version>
     <docker-maven-plugin.version>0.45.1</docker-maven-plugin.version>
     <docker.base.image>alpine:3.14</docker.base.image>
     <docker.image>wing-plan</docker.image>
     <docker.platform>linux/amd64</docker.platform>
-    <docker.tag>v.0.0.1-20241125104807</docker.tag>
-    <java.version>21</java.version>
-    <kalix-runtime.version>1.2.1</kalix-runtime.version>
+    <docker.tag>v.0.0.1-20241212185237</docker.tag>
+    <kalix-runtime.version>1.2.2</kalix-runtime.version>
     <logback.configurationFile>logback-runtime-dev-mode.xml</logback.configurationFile>
     <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
     <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
@@ -78,7 +77,7 @@
       <dependency>
         <groupId>io.akka</groupId>
         <artifactId>akka-javasdk</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.2</version>
         <exclusions>
           <exclusion>
             <groupId>com.lightbend.akka.grpc</groupId>
@@ -89,7 +88,7 @@
       <dependency>
         <groupId>io.akka</groupId>
         <artifactId>akka-javasdk-testkit</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.2</version>
         <exclusions>
           <exclusion>
             <groupId>com.lightbend.akka.grpc</groupId>
@@ -100,7 +99,7 @@
       <dependency>
         <groupId>io.kalix</groupId>
         <artifactId>kalix-dev-runtime_2.13</artifactId>
-        <version>1.2.1</version>
+        <version>1.2.2</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -108,7 +107,7 @@
     <dependency>
       <groupId>io.akka</groupId>
       <artifactId>akka-javasdk</artifactId>
-      <version>3.0.0</version>
+      <version>3.0.2</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -120,7 +119,7 @@
     <dependency>
       <groupId>io.akka</groupId>
       <artifactId>akka-javasdk-testkit</artifactId>
-      <version>3.0.0</version>
+      <version>3.0.2</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -132,7 +131,7 @@
     <dependency>
       <groupId>io.kalix</groupId>
       <artifactId>kalix-dev-runtime_2.13</artifactId>
-      <version>1.2.1</version>
+      <version>1.2.2</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
@@ -212,8 +211,6 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.13.0</version>
           <configuration>
-            <source>21</source>
-            <target>21</target>
             <compilerArgs>
               <arg>-Xlint:deprecation</arg>
               <arg>-parameters</arg>
@@ -225,7 +222,7 @@
               <path>
                 <groupId>io.akka</groupId>
                 <artifactId>akka-javasdk-annotation-processor</artifactId>
-                <version>3.0.0</version>
+                <version>3.0.2</version>
               </path>
             </annotationProcessorPaths>
           </configuration>
@@ -251,7 +248,7 @@
                         <platform>linux/amd64</platform>
                       </buildOptions>
                       <tags>
-                        <tag>v.0.0.1-20241125104807</tag>
+                        <tag>v.0.0.1-20241212185237</tag>
                       </tags>
                       <assembly>
                         <inline>
@@ -332,7 +329,7 @@
                     <platform>linux/amd64</platform>
                   </buildOptions>
                   <tags>
-                    <tag>v.0.0.1-20241125104807</tag>
+                    <tag>v.0.0.1-20241212185237</tag>
                   </tags>
                   <assembly>
                     <inline>
@@ -448,6 +445,26 @@
           </configuration>
         </plugin>
         <plugin>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>3.1.2</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>integration-test</goal>
+              </goals>
+              <configuration>
+                <includes>
+                  <include>**/*IntegrationTest.java</include>
+                  <include>**/*IT.java</include>
+                  <include>**/IT*.java</include>
+                  <include>**/*ITCase.java</include>
+                </includes>
+                <argLine>-Dlogback.configurationFile=logback-runtime-dev-mode.xml -Dakka.javasdk.dev-mode.project-artifact-id=wing-plan</argLine>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>3.1.1</version>
           <configuration>
@@ -494,8 +511,6 @@
               <goal>compile</goal>
             </goals>
             <configuration>
-              <source>21</source>
-              <target>21</target>
               <compilerArgs>
                 <arg>-Xlint:deprecation</arg>
                 <arg>-parameters</arg>
@@ -507,7 +522,7 @@
                 <path>
                   <groupId>io.akka</groupId>
                   <artifactId>akka-javasdk-annotation-processor</artifactId>
-                  <version>3.0.0</version>
+                  <version>3.0.2</version>
                 </path>
               </annotationProcessorPaths>
             </configuration>
@@ -519,8 +534,6 @@
               <goal>testCompile</goal>
             </goals>
             <configuration>
-              <source>21</source>
-              <target>21</target>
               <compilerArgs>
                 <arg>-Xlint:deprecation</arg>
                 <arg>-parameters</arg>
@@ -532,15 +545,13 @@
                 <path>
                   <groupId>io.akka</groupId>
                   <artifactId>akka-javasdk-annotation-processor</artifactId>
-                  <version>3.0.0</version>
+                  <version>3.0.2</version>
                 </path>
               </annotationProcessorPaths>
             </configuration>
           </execution>
         </executions>
         <configuration>
-          <source>21</source>
-          <target>21</target>
           <compilerArgs>
             <arg>-Xlint:deprecation</arg>
             <arg>-parameters</arg>
@@ -552,7 +563,7 @@
             <path>
               <groupId>io.akka</groupId>
               <artifactId>akka-javasdk-annotation-processor</artifactId>
-              <version>3.0.0</version>
+              <version>3.0.2</version>
             </path>
           </annotationProcessorPaths>
         </configuration>
@@ -585,6 +596,26 @@
             <logback.configurationFile>logback-runtime-dev-mode.xml</logback.configurationFile>
           </systemPropertyVariables>
         </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>3.1.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/*IntegrationTest.java</include>
+                <include>**/*IT.java</include>
+                <include>**/IT*.java</include>
+                <include>**/*ITCase.java</include>
+              </includes>
+              <argLine>-Dlogback.configurationFile=logback-runtime-dev-mode.xml -Dakka.javasdk.dev-mode.project-artifact-id=wing-plan</argLine>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-deploy-plugin</artifactId>
@@ -660,7 +691,7 @@
                       <platform>linux/amd64</platform>
                     </buildOptions>
                     <tags>
-                      <tag>v.0.0.1-20241125104807</tag>
+                      <tag>v.0.0.1-20241212185237</tag>
                     </tags>
                     <assembly>
                       <inline>
@@ -742,7 +773,7 @@
                   <platform>linux/amd64</platform>
                 </buildOptions>
                 <tags>
-                  <tag>v.0.0.1-20241125104807</tag>
+                  <tag>v.0.0.1-20241212185237</tag>
                 </tags>
                 <assembly>
                   <inline>

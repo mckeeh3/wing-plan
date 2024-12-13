@@ -9,10 +9,8 @@ public interface Reservation {
   public enum Status {
     pending, // Initial state: awaiting confirmation from instructor and aircraft
     confirmed, // Both instructor and aircraft have accepted the reservation
-    cancelled, // Cancelled due to: student/instructor cancellation, aircraft unavailability,
-               // weather conditions, mechanical issues, or other safety concerns
-    completed, // Flight training session was completed successfully
-    no_show // Either student or instructor didn't show up for the session
+    cancelled // Cancelled due to: student/instructor cancellation, aircraft unavailability,
+              // weather conditions, mechanical issues, or other safety concerns
   }
 
   public enum ParticipantStatus {

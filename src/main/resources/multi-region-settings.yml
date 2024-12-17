@@ -1,0 +1,7 @@
+name: wing-plan
+service:
+  image: kcr.us-east-1.kalix.io/lightbend/multi-region-demos/wing-plan:v.0.0.1
+  replication:
+    mode: replicated-read
+    replicatedRead:
+      primarySelectionMode: dynamic

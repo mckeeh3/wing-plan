@@ -37,7 +37,6 @@ public interface TimeSlot {
 
     public Optional<Event> onCommand(Command.MakeTimeSlotAvailable command) {
       if (isEmpty()) {
-
         Instant roundedTime = command.startTime.plus(30, ChronoUnit.MINUTES).truncatedTo(ChronoUnit.HOURS);
         return Optional.of(new Event.TimeSlotMadeAvailable(
             command.timeSlotId,

@@ -52,7 +52,7 @@ public class BookingWorkflow extends Workflow<Booking.State> {
                 .method(TimeSlotView::getTimeSlotsByParticipantAndTimeRange)
                 .invokeAsync(command))
         .andThen(TimeSlotView.TimeSlots.class, queryResponse -> {
-          if (queryResponse.timeSlots().isEmpty()) {
+          if (queryResponse.timeSlots().isEmpty() || !queryResponse.timeSlots().get(0).status().equals(TimeSlot.Status.available.name())) {
             return effects()
                 .updateState(currentState().withStatus(Booking.Status.cancelledStudentNotAvailable))
                 .end();
@@ -72,7 +72,7 @@ public class BookingWorkflow extends Workflow<Booking.State> {
                 .method(TimeSlotView::getTimeSlotsByParticipantTypeAndTimeRange)
                 .invokeAsync(command))
         .andThen(TimeSlotView.TimeSlots.class, queryResponse -> {
-          if (queryResponse.timeSlots().isEmpty()) {
+          if (queryResponse.timeSlots().isEmpty() || !queryResponse.timeSlots().get(0).status().equals(TimeSlot.Status.available.name())) {
             return effects()
                 .updateState(currentState().withStatus(Booking.Status.cancelledInstructorNotAvailable))
                 .end();
@@ -93,7 +93,7 @@ public class BookingWorkflow extends Workflow<Booking.State> {
                 .method(TimeSlotView::getTimeSlotsByParticipantTypeAndTimeRange)
                 .invokeAsync(command))
         .andThen(TimeSlotView.TimeSlots.class, queryResponse -> {
-          if (queryResponse.timeSlots().isEmpty()) {
+          if (queryResponse.timeSlots().isEmpty() || !queryResponse.timeSlots().get(0).status().equals(TimeSlot.Status.available.name())) {
             return effects()
                 .updateState(currentState().withStatus(Booking.Status.cancelledAircraftNotAvailable))
                 .end();

@@ -95,6 +95,8 @@ public interface Reservation {
       var newStudent = new Participant(student.participantId(), student.participantType(), student.timeSlotId(), ParticipantStatus.unavailable);
       return List.of(
           new Event.StudentUnavailable(command.reservationId(), newStudent),
+          new Event.CancelledInstructorReservation(instructor.timeSlotId(), command.reservationId()),
+          new Event.CancelledAircraftReservation(aircraft.timeSlotId(), command.reservationId()),
           new Event.ReservationCancelled(command.reservationId()));
     }
 
@@ -120,6 +122,8 @@ public interface Reservation {
       var newInstructor = new Participant(instructor.participantId(), instructor.participantType(), instructor.timeSlotId(), ParticipantStatus.unavailable);
       return List.of(
           new Event.InstructorUnavailable(command.reservationId(), newInstructor),
+          new Event.CancelledStudentReservation(student.timeSlotId(), command.reservationId()),
+          new Event.CancelledAircraftReservation(aircraft.timeSlotId(), command.reservationId()),
           new Event.ReservationCancelled(reservationId));
     }
 
@@ -145,6 +149,8 @@ public interface Reservation {
       var newAircraft = new Participant(aircraft.participantId(), aircraft.participantType(), aircraft.timeSlotId(), ParticipantStatus.unavailable);
       return List.of(
           new Event.AircraftUnavailable(command.reservationId(), newAircraft),
+          new Event.CancelledStudentReservation(student.timeSlotId(), command.reservationId()),
+          new Event.CancelledInstructorReservation(instructor.timeSlotId(), command.reservationId()),
           new Event.ReservationCancelled(command.reservationId()));
     }
 

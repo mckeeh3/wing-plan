@@ -96,6 +96,12 @@ class ReservationEntityTest {
     var event = result.getNextEventOfType(Reservation.Event.StudentUnavailable.class);
     assertEquals(reservationId, event.reservationId());
 
+    var cancelledInstructorReservation = result.getNextEventOfType(Reservation.Event.CancelledInstructorReservation.class);
+    assertEquals(reservationId, cancelledInstructorReservation.reservationId());
+
+    var cancelledAircraftReservation = result.getNextEventOfType(Reservation.Event.CancelledAircraftReservation.class);
+    assertEquals(reservationId, cancelledAircraftReservation.reservationId());
+
     var cancelEvent = result.getNextEventOfType(Reservation.Event.ReservationCancelled.class);
     assertEquals(reservationId, cancelEvent.reservationId());
 
@@ -135,6 +141,12 @@ class ReservationEntityTest {
 
     var event = result.getNextEventOfType(Reservation.Event.InstructorUnavailable.class);
     assertEquals(reservationId, event.reservationId());
+
+    var cancelledStudentReservation = result.getNextEventOfType(Reservation.Event.CancelledStudentReservation.class);
+    assertEquals(reservationId, cancelledStudentReservation.reservationId());
+
+    var cancelledAircraftReservation = result.getNextEventOfType(Reservation.Event.CancelledAircraftReservation.class);
+    assertEquals(reservationId, cancelledAircraftReservation.reservationId());
 
     var cancelEvent = result.getNextEventOfType(Reservation.Event.ReservationCancelled.class);
     assertEquals(reservationId, cancelEvent.reservationId());
@@ -176,6 +188,12 @@ class ReservationEntityTest {
     var event = result.getNextEventOfType(Reservation.Event.AircraftUnavailable.class);
     assertEquals(reservationId, event.reservationId());
 
+    var cancelledStudentReservation = result.getNextEventOfType(Reservation.Event.CancelledStudentReservation.class);
+    assertEquals(reservationId, cancelledStudentReservation.reservationId());
+
+    var cancelledInstructorReservation = result.getNextEventOfType(Reservation.Event.CancelledInstructorReservation.class);
+    assertEquals(reservationId, cancelledInstructorReservation.reservationId());
+
     var cancelEvent = result.getNextEventOfType(Reservation.Event.ReservationCancelled.class);
     assertEquals(reservationId, cancelEvent.reservationId());
 
@@ -190,16 +208,13 @@ class ReservationEntityTest {
     var reservationId = setupPendingReservation(testKit);
 
     // Make student available
-    testKit.call(entity -> entity.studentAvailable(
-        new Reservation.Command.StudentAvailable(reservationId)));
+    testKit.call(entity -> entity.studentAvailable(new Reservation.Command.StudentAvailable(reservationId)));
 
     // Make instructor available
-    testKit.call(entity -> entity.instructorAvailable(
-        new Reservation.Command.InstructorAvailable(reservationId)));
+    testKit.call(entity -> entity.instructorAvailable(new Reservation.Command.InstructorAvailable(reservationId)));
 
     // Make aircraft available - this should trigger confirmation
-    var result = testKit.call(entity -> entity.aircraftAvailable(
-        new Reservation.Command.AircraftAvailable(reservationId)));
+    var result = testKit.call(entity -> entity.aircraftAvailable(new Reservation.Command.AircraftAvailable(reservationId)));
 
     var availableEvent = result.getNextEventOfType(Reservation.Event.AircraftAvailable.class);
     assertEquals(reservationId, availableEvent.reservationId());

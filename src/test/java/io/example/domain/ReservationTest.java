@@ -128,13 +128,17 @@ class ReservationTest {
     var events = state.onCommand(command);
 
     // Then
-    assertEquals(2, events.size());
+    assertEquals(4, events.size());
     assertTrue(events.get(0) instanceof Reservation.Event.StudentUnavailable);
-    assertTrue(events.get(1) instanceof Reservation.Event.ReservationCancelled);
+    assertTrue(events.get(1) instanceof Reservation.Event.CancelledInstructorReservation);
+    assertTrue(events.get(2) instanceof Reservation.Event.CancelledAircraftReservation);
+    assertTrue(events.get(3) instanceof Reservation.Event.ReservationCancelled);
 
     var newState = state
         .onEvent((Reservation.Event.StudentUnavailable) events.get(0))
-        .onEvent((Reservation.Event.ReservationCancelled) events.get(1));
+        .onEvent((Reservation.Event.CancelledInstructorReservation) events.get(1))
+        .onEvent((Reservation.Event.CancelledAircraftReservation) events.get(2))
+        .onEvent((Reservation.Event.ReservationCancelled) events.get(3));
     assertEquals(Reservation.ParticipantStatus.unavailable, newState.student().status());
     assertEquals(Reservation.Status.cancelled, newState.status());
   }
@@ -168,13 +172,17 @@ class ReservationTest {
     var events = state.onCommand(command);
 
     // Then
-    assertEquals(2, events.size());
+    assertEquals(4, events.size());
     assertTrue(events.get(0) instanceof Reservation.Event.InstructorUnavailable);
-    assertTrue(events.get(1) instanceof Reservation.Event.ReservationCancelled);
+    assertTrue(events.get(1) instanceof Reservation.Event.CancelledStudentReservation);
+    assertTrue(events.get(2) instanceof Reservation.Event.CancelledAircraftReservation);
+    assertTrue(events.get(3) instanceof Reservation.Event.ReservationCancelled);
 
     var newState = state
         .onEvent((Reservation.Event.InstructorUnavailable) events.get(0))
-        .onEvent((Reservation.Event.ReservationCancelled) events.get(1));
+        .onEvent((Reservation.Event.CancelledStudentReservation) events.get(1))
+        .onEvent((Reservation.Event.CancelledAircraftReservation) events.get(2))
+        .onEvent((Reservation.Event.ReservationCancelled) events.get(3));
     assertEquals(Reservation.ParticipantStatus.unavailable, newState.instructor().status());
     assertEquals(Reservation.Status.cancelled, newState.status());
   }
@@ -208,13 +216,17 @@ class ReservationTest {
     var events = state.onCommand(command);
 
     // Then
-    assertEquals(2, events.size());
+    assertEquals(4, events.size());
     assertTrue(events.get(0) instanceof Reservation.Event.AircraftUnavailable);
-    assertTrue(events.get(1) instanceof Reservation.Event.ReservationCancelled);
+    assertTrue(events.get(1) instanceof Reservation.Event.CancelledStudentReservation);
+    assertTrue(events.get(2) instanceof Reservation.Event.CancelledInstructorReservation);
+    assertTrue(events.get(3) instanceof Reservation.Event.ReservationCancelled);
 
     var newState = state
         .onEvent((Reservation.Event.AircraftUnavailable) events.get(0))
-        .onEvent((Reservation.Event.ReservationCancelled) events.get(1));
+        .onEvent((Reservation.Event.CancelledStudentReservation) events.get(1))
+        .onEvent((Reservation.Event.CancelledInstructorReservation) events.get(2))
+        .onEvent((Reservation.Event.ReservationCancelled) events.get(3));
     assertEquals(Reservation.ParticipantStatus.unavailable, newState.aircraft().status());
     assertEquals(Reservation.Status.cancelled, newState.status());
   }

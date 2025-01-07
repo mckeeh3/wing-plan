@@ -133,9 +133,9 @@ class IntegrationTest extends TestKitSupport {
     var reservationId = Reservation.generateReservationId();
     var studentId = "student-1";
     var instructorId = "instructor-1";
+    var aircraftId = "aircraft-1";
     var studentTimeSlotId = "student-timeSlot-1";
     var instructorTimeSlotId = "instructor-timeSlot-2";
-    var aircraftId = "aircraft-1";
     var aircraftTimeSlotId = "aircraft-timeSlot-3";
 
     var reservationTime = Instant.now();
@@ -200,12 +200,12 @@ class IntegrationTest extends TestKitSupport {
 
       var status = Status.pending;
       while (status != Status.cancelled) {
+        Thread.sleep(100); // Add small delay between status check
         var state = await(componentClient.forEventSourcedEntity(reservationId)
             .method(ReservationEntity::get)
             .invokeAsync());
         status = state.status();
         log.info("Reservation status: {}", status);
-        Thread.sleep(100); // Add small delay between checks
       }
       log.info("Reservation cancelled");
     }

@@ -84,10 +84,10 @@ Instant reservationTime
 -H 'Content-Type: application/json' \
 -d '{
       "reservationId": "ABC123",
-      "studentId": "student-123", 
+      "studentId": "student-123",
       "studentTimeSlotId": "slot-s-123",
       "instructorId": "instructor-456",
-      "instructorTimeSlotId": "slot-i-456", 
+      "instructorTimeSlotId": "slot-i-456",
       "aircraftId": "aircraft-789",
       "aircraftTimeSlotId": "slot-a-789",
       "reservationTime": "2024-03-20T14:00:00Z"
@@ -128,7 +128,7 @@ String reservationId</code></td>
 -H 'Content-Type: application/json' \
 -d '{
       "timeSlotId": "ts-123",
-      "participantId": "instructor-456", 
+      "participantId": "instructor-456",
       "participantType": "instructor",
       "startTime": "2024-03-20T14:00:00Z"
     }'</code></td>
@@ -170,7 +170,7 @@ String timeSlotId</code></td>
 -H 'Content-Type: application/json' \
 -d '{
       "participantType": "instructor",
-      "timeBegin": "2024-03-20T00:00:00Z", 
+      "timeBegin": "2024-03-20T00:00:00Z",
       "timeEnd": "2024-03-21T00:00:00Z"
     }'</code></td>
 <td><code>
@@ -185,7 +185,7 @@ Instant timeEnd</code></td>
 -H 'Content-Type: application/json' \
 -d '{
       "participantId": "instructor123",
-      "participantType": "INSTRUCTOR", 
+      "participantType": "INSTRUCTOR",
       "timeBegin": "2024-03-20T00:00:00Z",
       "timeEnd": "2024-03-21T00:00:00Z"
     }'</code></td>

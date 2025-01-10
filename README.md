@@ -413,6 +413,25 @@ Process the HTTP request to start a reservation booking workflow.
 
 ![booking workflow](images/booking-workflow.png)
 
+![booking workflow student 1](images/booking-workflow-student-1-2.png)
+
+![booking workflow student 2](images/booking-workflow-student-2-2.png)
+
+![booking workflow instructor 1](images/booking-workflow-instructor-1-2.png)
+
+![booking workflow instructor 2](images/booking-workflow-instructor-2-2.png)
+
+![booking workflow aircraft 1](images/booking-workflow-aircraft-1-2.png)
+
+---
+---
+
+
+
+![booking workflow](images/booking-workflow.png)
+
+![booking workflow aircraft 1](images/booking-workflow-aircraft-2-2.png)
+
 Process the four workflow steps. First, query the time slot view to check the availability of the student, an instructor, and an aircraft. If all are available, send a command to create a reservation and terminate the workflow.
 
 The reservation is created with a pending status. It also emits events that trigger reservation requests for all three participant time slots.

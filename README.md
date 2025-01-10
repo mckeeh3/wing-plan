@@ -423,10 +423,10 @@ Process the HTTP request to start a reservation booking workflow.
 
 ![booking workflow aircraft 1](images/booking-workflow-aircraft-1-2.png)
 
+![booking workflow aircraft 2](images/booking-workflow-aircraft-2-2.png)
+
 ---
 ---
-
-
 
 ![booking workflow](images/booking-workflow.png)
 
@@ -450,7 +450,7 @@ The participant’s time slot either entity accepts or rejects the reservation b
 
 ![booking workflow instructor 2](images/booking-workflow-instructor-2.png)
 
-![booking workflow aircraft 1](images/booking-workflow-aircraft-2.png)
+![booking workflow aircraft 2](images/booking-workflow-aircraft-2.png)
 
 The consumer processes the time slot accept or reject events and forwards them to the ReservationEntity. If all three participants are available, the reservation status is set to confirmed, and the reservation processing flow is complete. If one or more time slots are unavailable, the reservation is canceled.
 

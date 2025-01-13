@@ -411,26 +411,21 @@ When a reservation is canceled due to one or more unavailable participants, the 
 
 Process the HTTP request to start a reservation booking workflow.
 
-![booking workflow](images/booking-workflow.png)
+![booking workflow 1](images/booking-workflow-1-0.png)
 
-![booking workflow student 1](images/booking-workflow-student-1-2.png)
+![booking workflow 2](images/booking-workflow-2-0.png)
 
-![booking workflow student 2](images/booking-workflow-student-2-2.png)
+![booking workflow 3](images/booking-workflow-3-0.png)
 
-![booking workflow instructor 1](images/booking-workflow-instructor-1-2.png)
+![booking workflow 4](images/booking-workflow-4-0.png)
 
-![booking workflow instructor 2](images/booking-workflow-instructor-2-2.png)
+![booking workflow 5](images/booking-workflow-5-0.png)
 
-![booking workflow aircraft 1](images/booking-workflow-aircraft-1-2.png)
+![booking workflow 6](images/booking-workflow-6-0.png)
 
-![booking workflow aircraft 2](images/booking-workflow-aircraft-2-2.png)
+![booking workflow 7](images/booking-workflow-7-0.png)
 
----
----
-
-![booking workflow](images/booking-workflow.png)
-
-![booking workflow aircraft 1](images/booking-workflow-aircraft-2-2.png)
+![booking workflow 8](images/booking-workflow-8-0.png)
 
 Process the four workflow steps. First, query the time slot view to check the availability of the student, an instructor, and an aircraft. If all are available, send a command to create a reservation and terminate the workflow.
 
@@ -438,27 +433,9 @@ The reservation is created with a pending status. It also emits events that trig
 
 The event consumer sends commands to the participant's time slot to request a time slot reservation.
 
-![booking workflow student 1](images/booking-workflow-student-1.png)
-
-![booking workflow instructor 1](images/booking-workflow-instructor-1.png)
-
-![booking workflow aircraft 1](images/booking-workflow-aircraft-1.png)
-
 The participant’s time slot either entity accepts or rejects the reservation based on its current availability status. These events may trigger view updates. The TimeSlotToReservationConsumer will then process these events.
 
-![booking workflow student 2](images/booking-workflow-student-2.png)
-
-![booking workflow instructor 2](images/booking-workflow-instructor-2.png)
-
-![booking workflow aircraft 2](images/booking-workflow-aircraft-2.png)
-
 The consumer processes the time slot accept or reject events and forwards them to the ReservationEntity. If all three participants are available, the reservation status is set to confirmed, and the reservation processing flow is complete. If one or more time slots are unavailable, the reservation is canceled.
-
-![reservation to time slot consumer 1](images/reservation-to-time-slot-consumer-1.png)
-
-![reservation to time slot consumer 2](images/reservation-to-time-slot-consumer-2.png)
-
-![reservation to time slot consumer 3](images/reservation-to-time-slot-consumer-3.png)
 
 When a reservation is canceled, the entity emits events, one for each participant. These events trigger sending commands to the time slots of the participants. The time slot reservations have been cleared, and the status is available.
 

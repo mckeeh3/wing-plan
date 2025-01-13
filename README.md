@@ -124,7 +124,7 @@ String reservationId</code></td>
 <tr>
 <td>POST</td>
 <td>/flight/make-time-slot-available<br/><br/><code>curl -X POST \
-'http://localhost:8080/make-time-slot-available' \
+'http://localhost:8080/flight/make-time-slot-available' \
 -H 'Content-Type: application/json' \
 -d '{
       "timeSlotId": "ts-123",
@@ -166,7 +166,7 @@ String timeSlotId</code></td>
 <tr>
 <td>POST</td>
 <td>/flight/time-slot-view-by-type-and-time-range<br/><br/><code>curl -X POST \
-'http://localhost:9000/time-slot-view-by-type-and-time-range' \
+'http://localhost:9000/flight/time-slot-view-by-type-and-time-range' \
 -H 'Content-Type: application/json' \
 -d '{
       "participantType": "instructor",

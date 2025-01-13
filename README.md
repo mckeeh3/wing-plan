@@ -199,7 +199,7 @@ Instant timeEnd</code></td>
 
 ## Flight Training Scheduler Core Functions
 
-The provided template repository contains all the business logic defined in domain objects. Your objective is to implement the necessary Akka SDK components that interact with the domain objects, processing requests, commands, and events.
+The provided template repository contains all the business logic defined in domain objects. Do not modify the provided domain objects, your objective is to implement the necessary Akka SDK components that interact with the domain objects, processing requests, commands, and events.
 
 ### Availability Management
 
@@ -232,7 +232,7 @@ The system maintains consistency through Akka's concurrency management, ensuring
 
 ## Flight Training Scheduler Components to Implement
 
-The Flight Training Scheduler application requires you to create 7 components with a single entry point (the Endpoint) and interact with one another through events.
+The Flight Training Scheduler application requires you to create 7 components with a single entry point (the Endpoint) and interact with one another through requests, commands, and events.
 
 ![Flight Training Scheduler Component Architecture](/images/component-architecture.png)
 
@@ -240,7 +240,7 @@ This component-based architecture leverages Akka SDK's capabilities to create a 
 
 ### Reservation Endpoint
 
-* Defines the external API for the application
+* Defines the external API for the service
 * Implemented as an Akka SDK HTTP Endpoint component
 * Handles incoming HTTP requests for reservation-related operations
 * Routes requests to appropriate internal components
@@ -333,14 +333,14 @@ When participants want to update their availability, they interact with the syst
 
 ### State Management and Event Flow
 
-TimeSlot entities process these commands, updating their internal state and emitting corresponding events that reflect the availability changes. These events serve as the system's official record of state changes.
+TimeSlot entities process these commands, updating their internal entity state and emitting corresponding events that reflect the availability changes. These events serve as the system's official record of state changes.
 
 ### View Maintenance
 
 The TimeSlotView component maintains a queryable representation of all time slots and their current states. It achieves this by:
 
 * Consuming events emitted by TimeSlot entity instances
-* Processing these events to update its internal state
+* Processing these events to update its internal view state
 * Maintaining an up-to-date projection of time slot availability
 
 This event-driven approach ensures that the TimeSlotView always reflects the current availability status of all participants, providing accurate data for the reservation booking process.
@@ -405,6 +405,8 @@ The ReservationEntity determines the final reservation status based on the respo
 
 This orchestrated flow ensures that reservations are only confirmed when all three participants have successfully secured their time slots, maintaining consistency across the system.
 
+### Cancel a Reservation
+
 When a reservation is canceled due to one or more unavailable participants, the reservation entity emits three cancel reservation events, one for each participant. These events are processed by the ReservationToTimeSlotConsumer, which then sends commands to cancel the time slot reservation. Existing time slots will change their status to available when they receive a cancellation command.
 
 ### Process flow diagrams
@@ -453,7 +455,7 @@ To assist developers in verifying the functionality of their implementation, we 
 
 ### Accessing the UI
 
-The UI application is available at: TODO
+The UI application is available at: [akka-dev-cert-ui](https://github.com/akka/akka-dev-cert-ui)
 
 ### Setup Instructions
 

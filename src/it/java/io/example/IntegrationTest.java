@@ -67,7 +67,6 @@ class IntegrationTest extends TestKitSupport {
 
     {
       var command = new TimeSlot.Command.MakeTimeSlotAvailable(
-          studentTimeSlotId,
           studentId,
           TimeSlot.ParticipantType.student,
           reservationTime);
@@ -79,7 +78,6 @@ class IntegrationTest extends TestKitSupport {
 
     {
       var command = new TimeSlot.Command.MakeTimeSlotAvailable(
-          instructorTimeSlotId,
           instructorId,
           TimeSlot.ParticipantType.instructor,
           reservationTime);
@@ -91,7 +89,6 @@ class IntegrationTest extends TestKitSupport {
 
     {
       var command = new TimeSlot.Command.MakeTimeSlotAvailable(
-          aircraftTimeSlotId,
           aircraftId,
           TimeSlot.ParticipantType.aircraft,
           reservationTime);
@@ -142,7 +139,6 @@ class IntegrationTest extends TestKitSupport {
 
     {
       var command = new TimeSlot.Command.MakeTimeSlotAvailable(
-          studentTimeSlotId,
           studentId,
           TimeSlot.ParticipantType.student,
           reservationTime);
@@ -154,7 +150,6 @@ class IntegrationTest extends TestKitSupport {
 
     {
       var command = new TimeSlot.Command.MakeTimeSlotAvailable(
-          instructorTimeSlotId,
           instructorId,
           TimeSlot.ParticipantType.instructor,
           reservationTime);
@@ -166,7 +161,6 @@ class IntegrationTest extends TestKitSupport {
 
     {
       var command = new TimeSlot.Command.MakeTimeSlotAvailable(
-          aircraftTimeSlotId,
           aircraftId,
           TimeSlot.ParticipantType.aircraft,
           reservationTime);

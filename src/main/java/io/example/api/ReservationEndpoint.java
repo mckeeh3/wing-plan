@@ -64,7 +64,8 @@ public class ReservationEndpoint {
   @Post("/make-time-slot-available")
   public CompletionStage<Done> createTimeSlot(TimeSlot.Command.MakeTimeSlotAvailable command) {
     log.info("{}", command);
-    return componentClient.forEventSourcedEntity(command.timeSlotId())
+    var timeSlotId = TimeSlot.State.entityId(command.participantId(), command.participantType(), command.startTime());
+    return componentClient.forEventSourcedEntity(timeSlotId)
         .method(TimeSlotEntity::createTimeSlot)
         .invokeAsync(command);
   }
@@ -72,7 +73,8 @@ public class ReservationEndpoint {
   @Put("/make-time-slot-unavailable")
   public CompletionStage<Done> makeTimeSlotUnavailable(TimeSlot.Command.MakeTimeSlotUnavailable command) {
     log.info("{}", command);
-    return componentClient.forEventSourcedEntity(command.timeSlotId())
+    var timeSlotId = TimeSlot.State.entityId(command.participantId(), command.participantType(), command.startTime());
+    return componentClient.forEventSourcedEntity(timeSlotId)
         .method(TimeSlotEntity::makeTimeSlotUnavailable)
         .invokeAsync(command);
   }

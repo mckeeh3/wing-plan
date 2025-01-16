@@ -8,12 +8,19 @@ import org.junit.jupiter.api.Test;
 import io.example.domain.TimeSlot.ParticipantType;
 
 class TimeSlotTest {
+  @Test
+  void entityIdFromParticipantIdAndTypeAndStartTime() {
+    var participantId = "participant-1";
+    var participantType = ParticipantType.aircraft;
+    var startTime = Instant.parse("2024-03-20T10:00:00Z");
+    var timeSlotId = TimeSlot.State.entityId(participantId, participantType, startTime);
+    assertThat(timeSlotId).isEqualTo("2024-03-20-10-aircraft-participant-1");
+  }
 
   @Test
   void shouldMakeTimeSlotAvailable() {
     // given
     var command = new TimeSlot.Command.MakeTimeSlotAvailable(
-        "timeSlot-1",
         "participant-1",
         ParticipantType.aircraft,
         Instant.parse("2024-03-20T10:00:00Z"));
@@ -27,7 +34,8 @@ class TimeSlotTest {
     var event = eventOpt.get();
     assertThat(event).isInstanceOf(TimeSlot.Event.TimeSlotMadeAvailable.class);
     var available = (TimeSlot.Event.TimeSlotMadeAvailable) event;
-    assertThat(available.timeSlotId()).isEqualTo(command.timeSlotId());
+    var timeSlotId = TimeSlot.State.entityId(command.participantId(), command.participantType(), command.startTime());
+    assertThat(available.timeSlotId()).isEqualTo(timeSlotId);
     assertThat(available.participantId()).isEqualTo(command.participantId());
     assertThat(available.participantType()).isEqualTo(command.participantType());
     assertThat(available.startTime()).isEqualTo(command.startTime());
@@ -38,7 +46,6 @@ class TimeSlotTest {
     // given
     var state = makeTimeSlotAvailable();
     var command = new TimeSlot.Command.MakeTimeSlotAvailable(
-        "timeSlot-1",
         "participant-2",
         ParticipantType.aircraft,
         Instant.parse("2024-03-20T10:00:00Z"));
@@ -54,7 +61,10 @@ class TimeSlotTest {
   void shouldMakeTimeSlotUnavailable() {
     // given
     var state = makeTimeSlotAvailable();
-    var command = new TimeSlot.Command.MakeTimeSlotUnavailable("timeSlot-1");
+    var command = new TimeSlot.Command.MakeTimeSlotUnavailable(
+        state.participantId(),
+        state.participantType(),
+        state.startTime());
 
     // when
     var eventOpt = state.onCommand(command);
@@ -64,21 +74,50 @@ class TimeSlotTest {
     var event = eventOpt.get();
     assertThat(event).isInstanceOf(TimeSlot.Event.TimeSlotMadeUnavailable.class);
     var unavailable = (TimeSlot.Event.TimeSlotMadeUnavailable) event;
-    assertThat(unavailable.timeSlotId()).isEqualTo(command.timeSlotId());
+    var timeSlotId = TimeSlot.State.entityId(command.participantId(), command.participantType(), command.startTime());
+    assertThat(unavailable.timeSlotId()).isEqualTo(timeSlotId);
   }
 
   @Test
   void shouldNotChangeStateWhenAlreadyUnavailable() {
     // given
     var state = makeTimeSlotAvailable();
-    var command = new TimeSlot.Command.MakeTimeSlotUnavailable("timeSlot-1");
+    var command = new TimeSlot.Command.MakeTimeSlotUnavailable(
+        state.participantId(),
+        state.participantType(),
+        state.startTime());
 
     // when
-    state = state.onEvent(new TimeSlot.Event.TimeSlotMadeUnavailable("timeSlot-1")); // duplicate event to simulate duplicate command
+    state = state.onEvent(new TimeSlot.Event.TimeSlotMadeUnavailable(state.timeSlotId())); // duplicate event to simulate duplicate command
     var eventOpt = state.onCommand(command);
 
     // then
     assertThat(eventOpt).isEmpty();
+  }
+
+  @Test
+  void makeAvailableThenMakeUnavailableThenMakeAvailable() {
+    // given
+    var state = makeTimeSlotAvailable();
+    state = state.onEvent(new TimeSlot.Event.TimeSlotMadeUnavailable(state.timeSlotId()));
+    var command = new TimeSlot.Command.MakeTimeSlotAvailable(
+        state.participantId(),
+        state.participantType(),
+        state.startTime());
+
+    // when
+    var eventOpt = state.onCommand(command);
+
+    // then
+    assertThat(eventOpt).isPresent();
+    var event = eventOpt.get();
+    assertThat(event).isInstanceOf(TimeSlot.Event.TimeSlotMadeAvailable.class);
+    var available = (TimeSlot.Event.TimeSlotMadeAvailable) event;
+    var timeSlotId = TimeSlot.State.entityId(command.participantId(), command.participantType(), command.startTime());
+    assertThat(available.timeSlotId()).isEqualTo(timeSlotId);
+    assertThat(available.participantId()).isEqualTo(command.participantId());
+    assertThat(available.participantType()).isEqualTo(command.participantType());
+    assertThat(available.startTime()).isEqualTo(command.startTime());
   }
 
   @Test
@@ -304,7 +343,6 @@ class TimeSlotTest {
   // Helper method
   private TimeSlot.State makeTimeSlotAvailable() {
     var command = new TimeSlot.Command.MakeTimeSlotAvailable(
-        "timeSlot-1",
         "participant-1",
         ParticipantType.aircraft,
         Instant.parse("2024-03-20T10:00:00Z"));

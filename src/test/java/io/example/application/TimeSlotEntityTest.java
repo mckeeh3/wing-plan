@@ -18,14 +18,13 @@ class TimeSlotEntityTest {
   void testMakeTimeSlotAvailable() {
     var testKit = EventSourcedTestKit.of(TimeSlotEntity::new);
 
-    var timeSlotId = "timeSlot-1";
     var participantId = "participant-1";
     var participantType = ParticipantType.aircraft;
     var startTime = Instant.parse("2024-03-20T10:00:00Z");
+    var timeSlotId = TimeSlot.State.entityId(participantId, participantType, startTime);
 
     {
       var command = new TimeSlot.Command.MakeTimeSlotAvailable(
-          timeSlotId,
           participantId,
           participantType,
           startTime);
@@ -55,14 +54,12 @@ class TimeSlotEntityTest {
   void testCreateTimeSlotThatAlreadyExists() {
     var testKit = EventSourcedTestKit.of(TimeSlotEntity::new);
 
-    var timeSlotId = "timeSlot-1";
     var participantId = "participant-1";
     var participantType = ParticipantType.aircraft;
     var startTime = Instant.parse("2024-03-20T10:00:00Z");
 
     {
       var command = new TimeSlot.Command.MakeTimeSlotAvailable(
-          timeSlotId,
           participantId,
           participantType,
           startTime);
@@ -74,7 +71,6 @@ class TimeSlotEntityTest {
 
     {
       var command = new TimeSlot.Command.MakeTimeSlotAvailable(
-          timeSlotId,
           participantId,
           participantType,
           startTime);
@@ -87,9 +83,15 @@ class TimeSlotEntityTest {
   @Test
   void testMakeTimeSlotUnavailable() {
     var testKit = EventSourcedTestKit.of(TimeSlotEntity::new);
+    var participantId = "participant-1";
+    var participantType = ParticipantType.aircraft;
+    var startTime = Instant.parse("2024-03-20T10:00:00Z");
     var timeSlotId = setupAvailableTimeSlot(testKit);
 
-    var command = new TimeSlot.Command.MakeTimeSlotUnavailable(timeSlotId);
+    var command = new TimeSlot.Command.MakeTimeSlotUnavailable(
+        participantId,
+        participantType,
+        startTime);
     var result = testKit.call(entity -> entity.makeTimeSlotUnavailable(command));
 
     assertTrue(result.isReply());
@@ -102,9 +104,14 @@ class TimeSlotEntityTest {
   @Test
   void testMakeTimeSlotUnavailableWhenAlreadyUnavailable() {
     var testKit = EventSourcedTestKit.of(TimeSlotEntity::new);
-    var timeSlotId = setupAvailableTimeSlot(testKit);
+    var participantId = "participant-1";
+    var participantType = ParticipantType.aircraft;
+    var startTime = Instant.parse("2024-03-20T10:00:00Z");
 
-    var command = new TimeSlot.Command.MakeTimeSlotUnavailable(timeSlotId);
+    var command = new TimeSlot.Command.MakeTimeSlotUnavailable(
+        participantId,
+        participantType,
+        startTime);
     testKit.call(entity -> entity.makeTimeSlotUnavailable(command)); // duplicate command to simulate duplicate command
     var result = testKit.call(entity -> entity.makeTimeSlotUnavailable(command));
 
@@ -281,13 +288,14 @@ class TimeSlotEntityTest {
   }
 
   private String setupAvailableTimeSlot(EventSourcedTestKit<TimeSlot.State, TimeSlot.Event, TimeSlotEntity> testKit) {
-    var timeSlotId = "timeSlot-1";
+    var participantId = "participant-1";
+    var participantType = ParticipantType.aircraft;
+    var startTime = Instant.parse("2024-03-20T10:00:00Z");
     var command = new TimeSlot.Command.MakeTimeSlotAvailable(
-        timeSlotId,
-        "participant-1",
-        ParticipantType.aircraft,
-        Instant.parse("2024-03-20T10:00:00Z"));
-    testKit.call(entity -> entity.createTimeSlot(command));
-    return timeSlotId;
+        participantId,
+        participantType,
+        startTime);
+    var result = testKit.call(entity -> entity.createTimeSlot(command));
+    return result.getNextEventOfType(TimeSlot.Event.TimeSlotMadeAvailable.class).timeSlotId();
   }
 }

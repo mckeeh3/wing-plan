@@ -1,6 +1,7 @@
 package io.example.domain;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
@@ -36,10 +37,11 @@ public interface TimeSlot {
     }
 
     public Optional<Event> onCommand(Command.MakeTimeSlotAvailable command) {
-      if (isEmpty()) {
+      if (isEmpty() || status == Status.unavailable) {
         Instant roundedTime = command.startTime.plus(30, ChronoUnit.MINUTES).truncatedTo(ChronoUnit.HOURS);
+        var timeSlotId = TimeSlot.State.entityId(command.participantId, command.participantType, command.startTime);
         return Optional.of(new Event.TimeSlotMadeAvailable(
-            command.timeSlotId,
+            timeSlotId,
             command.participantId,
             command.participantType,
             roundedTime));
@@ -49,7 +51,8 @@ public interface TimeSlot {
 
     public Optional<Event> onCommand(Command.MakeTimeSlotUnavailable command) {
       if (!isEmpty() && status == Status.available) {
-        return Optional.of(new Event.TimeSlotMadeUnavailable(command.timeSlotId));
+        var timeSlotId = TimeSlot.State.entityId(command.participantId, command.participantType, command.startTime);
+        return Optional.of(new Event.TimeSlotMadeUnavailable(timeSlotId));
       }
       return Optional.empty();
     }
@@ -104,8 +107,9 @@ public interface TimeSlot {
     }
 
     public State onEvent(Event.TimeSlotMadeAvailable event) {
+      var timeSlotId = entityId(event.participantId, event.participantType, event.startTime);
       return new State(
-          event.timeSlotId,
+          timeSlotId.toString(),
           event.participantId,
           event.participantType,
           event.startTime,
@@ -174,17 +178,27 @@ public interface TimeSlot {
     public State onEvent(Event.AircraftRequestRejected event) {
       return this;
     }
+
+    public static String entityId(String participantId, ParticipantType participantType, Instant startTime) {
+      var roundedTime = startTime.plus(30, ChronoUnit.MINUTES).truncatedTo(ChronoUnit.HOURS);
+      var year = roundedTime.atZone(ZoneOffset.UTC).getYear();
+      var month = roundedTime.atZone(ZoneOffset.UTC).getMonthValue();
+      var day = roundedTime.atZone(ZoneOffset.UTC).getDayOfMonth();
+      var hour = roundedTime.atZone(ZoneOffset.UTC).getHour();
+      return "%d-%02d-%02d-%02d-%s-%s".formatted(year, month, day, hour, participantType.name(), participantId);
+    }
   }
 
   public sealed interface Command {
     record MakeTimeSlotAvailable(
-        String timeSlotId,
         String participantId,
         ParticipantType participantType,
         Instant startTime) implements Command {}
 
     record MakeTimeSlotUnavailable(
-        String timeSlotId) implements Command {}
+        String participantId,
+        ParticipantType participantType,
+        Instant startTime) implements Command {}
 
     record CancelTimeSlot(
         String timeSlotId,
